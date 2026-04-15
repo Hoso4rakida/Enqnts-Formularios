@@ -1,0 +1,12 @@
+/*
+Source - https://stackoverflow.com/a/13715488
+Posted by Rob Fletcher
+Retrieved 2026-04-15, License - CC BY-SA 3.0
+*/
+
+label input[type=radio] {
+    opacity: 0;
+}
+:checked {
+    opacity: 0;
+}
