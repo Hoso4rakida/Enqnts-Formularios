@@ -1,20 +1,25 @@
 "use server";
 
-import { kv } from "@vercel/kv";
+import { put } from "@vercel/blob";
 import crypto from "crypto";
 
-export async function salvarEnquete(data: any){
-    // Gerar o ID único (igual você fazia antes)
-    const NomeDaChave = crypto.randomBytes(4).toString("hex").toUpperCase();
+export async function salvarEnquete(data: any) {
+    const NomeDoArquivo = crypto.randomBytes(4).toString("hex").toUpperCase();
 
     try {
-        // Em vez de fs.writeFileSync, usamos kv.set
-        // A chave será 'enquete:ID' e o valor será o seu objetoFinal
-        await kv.set(`enquete:${NomeDaChave}`, data);
+        const blob = await put(`enquetes/${NomeDoArquivo}.json`, JSON.stringify(data), {
+            access: 'public',
+            addRandomSuffix: false,
+            contentType: 'application/json',
+        });
 
-        return { success: true, arquivo: NomeDaChave };
+        return { 
+            success: true, 
+            arquivo: NomeDoArquivo,
+            url: blob.url
+        };
     } catch (error) {
-        console.error("Erro ao salvar no KV: ", error);
+        console.error("Erro ao salvar no Vercel Blob: ", error);
         return { success: false };
     }
 }

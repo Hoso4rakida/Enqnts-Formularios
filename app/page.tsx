@@ -18,26 +18,34 @@ export default function Home() {
     votos: string[]
   }
 
-  function onSubmit(data: any) {
+async function onSubmit(data: any) {
     const PerguntaPrincipal = data.Pergunta;
 
-    const opcoesFormatadas: moldeOpcao[] = Object.keys(data).filter((chave) => chave !== "Pergunta")
-    .map((chave) => ({
-      texto: data[chave],
-      votos: []
-    }));
+    const opcoesFormatadas: moldeOpcao[] = Object.keys(data)
+      .filter((chave) => chave !== "Pergunta")
+      .map((chave) => ({
+        texto: data[chave],
+        votos: []
+      }));
 
     const objetoFinal = {
       Pergunta : PerguntaPrincipal,
       opcoes: opcoesFormatadas
     }
 
-    salvarEnquete(objetoFinal).then((res) => {
-      if (res.success) {
-        setPagina(`${window.location.origin}/formulario/${res.arquivo}`)
-        setEnquete(true)
+    try {
+      // Use await para garantir que o código espere o Blob responder
+      const res = await salvarEnquete(objetoFinal);
+      
+      if (res && res.success) {
+        setPagina(`${window.location.origin}/formulario/${res.arquivo}`);
+        setEnquete(true);
+      } else {
+        alert("A Vercel recusou o salvamento. Verifique o terminal do VS Code.");
       }
-    })
+    } catch (error) {
+      console.error("Erro crítico na chamada:", error);
+    }
   }
 
   return (

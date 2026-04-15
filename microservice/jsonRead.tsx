@@ -1,17 +1,18 @@
-import { kv } from "@vercel/kv";
-
+// microservice/jsonRead.ts
 export default async function LerJSON(id: string) {
-    try {
-        // O KV busca a chave e já retorna o objeto parseado
-        const dados = await kv.get(`enquete:${id}`);
 
-        if (!dados) {
-            return null;
-        }
+  const URL_BASE = process.env.NEXT_PUBLIC_BLOB_URL; 
+  const caminhoNoBlob = `${URL_BASE}${id}.json`;
 
-        return dados;
-    } catch (error) {
-        console.error("Erro ao ler do KV:", error);
-        return null;
-    }
+  try {
+    const response = await fetch(caminhoNoBlob, {
+      cache: 'no-store'
+    });
+
+    if (!response.ok) return null;
+
+    return await response.json();
+  } catch (error) {
+    return null;
+  }
 }
