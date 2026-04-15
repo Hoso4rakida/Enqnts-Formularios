@@ -1,29 +1,20 @@
 "use server";
 
-import fs from "fs";
-import path from "path";
+import { kv } from "@vercel/kv";
 import crypto from "crypto";
 
 export async function salvarEnquete(data: any){
-    // gerar
-    const NomeDoJson = crypto.randomBytes(4).toString("hex").toUpperCase();
+    // Gerar o ID único (igual você fazia antes)
+    const NomeDaChave = crypto.randomBytes(4).toString("hex").toUpperCase();
 
-    const CaminhoPasta = path.join(process.cwd(), "enquetes");
-    
-    //?pasta Existe
-    if(!fs.existsSync(CaminhoPasta)){
-        fs.mkdirSync(CaminhoPasta)
-    }
+    try {
+        // Em vez de fs.writeFileSync, usamos kv.set
+        // A chave será 'enquete:ID' e o valor será o seu objetoFinal
+        await kv.set(`enquete:${NomeDaChave}`, data);
 
-    const CaminhoArquivo = path.join(CaminhoPasta, `${NomeDoJson}.json`);
-
-    try{
-        const ConteudoJSON = JSON.stringify(data, null, 2);
-        fs.writeFileSync(CaminhoArquivo, ConteudoJSON)
-
-        return{success: true, arquivo: NomeDoJson}
-    } catch(error){
-        console.log("Erro ao criar o arquivo: ", error)
-        return{success: false};
+        return { success: true, arquivo: NomeDaChave };
+    } catch (error) {
+        console.error("Erro ao salvar no KV: ", error);
+        return { success: false };
     }
 }
