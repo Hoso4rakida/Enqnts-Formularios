@@ -1,16 +1,17 @@
-import fs from "fs";
-import path from "path";
+import { kv } from "@vercel/kv";
 
-export default async function LerJSON(id: string){
-    const CaminhoJSON = path.join(process.cwd(), 'enquetes', `${id}.json`);
+export default async function LerJSON(id: string) {
+    try {
+        // O KV busca a chave e já retorna o objeto parseado
+        const dados = await kv.get(`enquete:${id}`);
 
-    if(!fs.existsSync(CaminhoJSON)){
+        if (!dados) {
+            return null;
+        }
+
+        return dados;
+    } catch (error) {
+        console.error("Erro ao ler do KV:", error);
         return null;
     }
-
-    const ConteudoString = fs.readFileSync(CaminhoJSON, 'utf-8');
-
-    const dados = JSON.parse(ConteudoString);
-
-    return dados;
 }
