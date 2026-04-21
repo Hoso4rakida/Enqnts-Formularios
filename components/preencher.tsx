@@ -20,6 +20,15 @@ export default function Preencher({ dados, enquete }: propsData) {
 
   const { register, handleSubmit, reset } = useForm();
 
+  async function carregarVotosAtualizados() {
+  let caixaTemporaria: Record<string, any[]> = {};
+  for (const item of dados) {
+    const listadeVotos = await readVote(item.id);
+    caixaTemporaria[item.id] = listadeVotos;
+  }
+  setTotais(caixaTemporaria);
+}
+
   useEffect(() => {
     const idEnqueteAtual = enquete[0].id;
     const historicoVoto = localStorage.getItem(`voto_enquete_${idEnqueteAtual}`);
@@ -29,19 +38,10 @@ export default function Preencher({ dados, enquete }: propsData) {
   }, [enquete]);
 
   useEffect(() => {
-    async function buscarVoto() {
-      let caixaTemporaria: any = {};
-
-      for (const item of dados) {
-        const listadeVotos = await readVote(item.id)
-        caixaTemporaria[item.id] = listadeVotos;
-      }
-
-      setTotais(caixaTemporaria)
-    }
-
-    buscarVoto();
+    carregarVotosAtualizados();
   }, [dados])
+
+  
 
   async function onSubmit(data: any) {
     try {
@@ -56,6 +56,7 @@ export default function Preencher({ dados, enquete }: propsData) {
       localStorage.setItem(`voto_enquete_${enquete[0].id}`, "true");
       setVotou(true);
       alert("votado com sucesso");
+      carregarVotosAtualizados();
     } catch (error) {
       alert("Erro ao enviar a resposta, tente novamente. \n" + error)
     }
