@@ -17,6 +17,7 @@ export default function Preencher({ dados, enquete }: propsData) {
   const texto = enquete[0].titulo;
   const [votosTotais, setTotais] = useState<Record<string, any[]>>({})
   const [jaVoto, setVotou] = useState(false)
+  const [accordionAberto, setAccordionAberto] = useState<string | null>(null)
 
   const { register, handleSubmit, reset } = useForm();
 
@@ -133,10 +134,22 @@ export default function Preencher({ dados, enquete }: propsData) {
               const votosDesta = votosTotais[item.id] || []
               return (
                 <div key={item.id}>
-                  <h3 className="text-xl font-bold m-5">{item.opcao}: {votosDesta.length}</h3>
-                  {votosDesta.map((voto: any) => (
-                    <p key={voto.id} className="p-3 ml-3">• {voto.votante}</p>
-                  ))}
+                  <button
+                    onClick={() => setAccordionAberto(accordionAberto === item.id ? null : item.id)}
+                    className="w-full text-left"
+                  >
+                    <h3 className="text-xl font-bold m-5 flex justify-between items-center">
+                      {item.opcao}: {votosDesta.length}
+                      <span className={`transform transition-transform duration-200 ${accordionAberto === item.id ? 'rotate-180' : ''}`}>
+                        ▼
+                      </span>
+                    </h3>
+                  </button>
+                  <div className={`overflow-hidden transition-all duration-300 ${accordionAberto === item.id ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                    {votosDesta.map((voto: any) => (
+                      <p key={voto.id} className="p-3 ml-3">• {voto.votante}</p>
+                    ))}
+                  </div>
                   <hr className="text-slate-300" />
                 </div>
               )
