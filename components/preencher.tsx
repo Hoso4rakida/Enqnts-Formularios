@@ -113,7 +113,7 @@ export default function Preencher({ dados, enquete }: propsData) {
           {!jaVoto ? (
             <button
               type="submit"
-              className="px-8 py-3 buttonSend bg-cyan-600 text-white font-bold hover:bg-cyan-700 transition-all rounded-lg"
+              className="px-8 py-3 buttonSend bg-cyan-600 text-white font-bold hover:bg-cyan-700 transition-all rounded-lg cursor-pointer"
             >
               Enviar Resposta
             </button>
