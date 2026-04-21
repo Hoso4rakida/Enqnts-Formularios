@@ -4,3 +4,5 @@ enquetes/
 .env.local
 .vercel
 .env*.local
+
+/app/generated/prisma

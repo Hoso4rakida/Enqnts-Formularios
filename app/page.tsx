@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Bar from "@/components/bar";
-import { useForm, SubmitHandler } from "react-hook-form"
-import { salvarEnquete } from "@/microservice/jsonCreate";
+import { useForm } from "react-hook-form"
 import { MdOutlineContentCopy } from "react-icons/md";
+import { createEnquete } from "@/microservice/querys";
 
 export default function Home() {
   const [opcoes, setOpcoes] = useState(["Opção 1", "Opção 2"])
@@ -13,40 +13,25 @@ export default function Home() {
 
   const { register, handleSubmit } = useForm()
 
-  interface moldeOpcao{
-    texto: string,
-    votos: string[]
-  }
-
-async function onSubmit(data: any) {
-    const PerguntaPrincipal = data.Pergunta;
-
-    const opcoesFormatadas: moldeOpcao[] = Object.keys(data)
-      .filter((chave) => chave !== "Pergunta")
-      .map((chave) => ({
-        texto: data[chave],
-        votos: []
-      }));
-
-    const objetoFinal = {
-      Pergunta : PerguntaPrincipal,
-      opcoes: opcoesFormatadas
-    }
+  async function onSubmit(data: any) {
+    console.log(JSON.stringify(data))
 
     try {
-      // Use await para garantir que o código espere o Blob responder
-      const res = await salvarEnquete(objetoFinal);
+      const titulo = data.Pergunta;
+      const listaOpcoes = opcoes.map(idOpcao => data[idOpcao]); 
+
+      const res = await createEnquete(titulo,listaOpcoes);
       
-      if (res && res.success) {
-        setPagina(`${window.location.origin}/formulario/${res.arquivo}`);
+      if (res) {
+        setPagina(`${window.location.origin}/formulario/${res}`);
         setEnquete(true);
       } else {
-        alert("A Vercel recusou o salvamento. Verifique o terminal do VS Code.");
+        alert("Falha ao criar a enquete. Entre em contato com o responsavel pelo o site.");
       }
     } catch (error) {
       console.error("Erro crítico na chamada:", error);
     }
-  }
+     }
 
   return (
     <main>
@@ -72,7 +57,7 @@ async function onSubmit(data: any) {
                 id="question"
                 required
                 className="w-full p-2 border border-gray-300 rounded mt-1 focus:ring-2 focus:ring-cyan-500 outline-none"
-                placeholder="Qual o tema da enquete?"
+                placeholder="Qual é o titulo da enquete?"
                 {...register("Pergunta")}
               />
             </div>
